@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadeado Imports</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #26e2db, #fc410f, #fa3746);
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            width: 70%;
+            display: block;
+            margin: 10px auto;
+        }
+        button {
+            padding: 8px 16px;
+            font-size: 14px;
+            background: red;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: darkred;
+        }
+        .lock {
+            font-size: 80px;
+            display: block;
+            transition: transform 0.5s ease-in-out;
+        }
+        .hidden { display: none; }
+        .highlight {
+            color: #26e2db;
+            font-weight: bold;
+        }
+        .message {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .keypad button {
+            padding: 15px;
+            font-size: 20px;
+            background: #333;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .keypad button:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="nameSection">
+            <p>Digite seu nome para começar:</p>
+            <input type="text" id="username" placeholder="Seu nome">
+            <button onclick="startGame()">Iniciar</button>
+        </div>
+        <div id="lockSection" class="hidden">
+            <p id="welcomeMessage"></p>
+            <span id="lock" class="lock">🔒</span>
+            <p>Digite a senha de 6 dígitos:</p>
+            <input type="password" id="password" maxlength="6" readonly>
+            <div class="keypad">
+                <button onclick="insertNumber('1')">1</button>
+                <button onclick="insertNumber('2')">2</button>
+                <button onclick="insertNumber('3')">3</button>
+                <button onclick="insertNumber('4')">4</button>
+                <button onclick="insertNumber('5')">5</button>
+                <button onclick="insertNumber('6')">6</button>
+                <button onclick="insertNumber('7')">7</button>
+                <button onclick="insertNumber('8')">8</button>
+                <button onclick="insertNumber('9')">9</button>
+                <button onclick="clearNumber()">⌫</button>
+                <button onclick="insertNumber('0')">0</button>
+                <button onclick="checkPassword()">✔</button>
+            </div>
+            <p id="attempts">Tentativas restantes: 10</p>
+            <p id="message" class="message"></p>
+        </div>
+        <div id="unlockSection" class="hidden">
+            <p><strong class="highlight">Quer mais tentativas?</strong></p>
+            <p>Envie <strong class="highlight">‘MAIS’</strong> no Instagram da</p>
+            <p><strong class="highlight">@imports</strong> e receba a senha de desbloqueio!</p>
+            <input type="password" id="unlockPassword" maxlength="6" readonly>
+            <div class="keypad">
+                <button onclick="insertUnlockNumber('1')">1</button>
+                <button onclick="insertUnlockNumber('2')">2</button>
+                <button onclick="insertUnlockNumber('3')">3</button>
+                <button onclick="insertUnlockNumber('4')">4</button>
+                <button onclick="insertUnlockNumber('5')">5</button>
+                <button onclick="insertUnlockNumber('6')">6</button>
+                <button onclick="insertUnlockNumber('7')">7</button>
+                <button onclick="insertUnlockNumber('8')">8</button>
+                <button onclick="insertUnlockNumber('9')">9</button>
+                <button onclick="clearUnlockNumber()">⌫</button>
+                <button onclick="insertUnlockNumber('0')">0</button>
+                <button onclick="checkUnlockPassword()">✔</button>
+            </div>
+            <p id="unlockMessage" class="message"></p>
+        </div>
+    </div>
+
+    <script>
+        let attempts = 10;
+        let username = "";
+        const correctPassword = "123456";
+        const unlockPassword = "654321";
+
+        function startGame() {
+            username = document.getElementById("username").value.trim();
+            if (!username) {
+                document.getElementById("message").textContent = "Digite seu nome!";
+                return;
+            }
+            document.getElementById("nameSection").classList.add("hidden");
+            document.getElementById("lockSection").classList.remove("hidden");
+            document.getElementById("welcomeMessage").textContent = `Bem-vindo, ${username}!`;
+        }
+
+        function insertNumber(num) {
+            let input = document.getElementById("password");
+            if (input.value.length < 6) input.value += num;
+        }
+
+        function clearNumber() {
+            let input = document.getElementById("password");
+            input.value = input.value.slice(0, -1);
+        }
+
+        function checkPassword() {
+            let input = document.getElementById("password").value;
+            if (input === correctPassword) {
+                document.getElementById("lock").textContent = "🔓";
+                document.getElementById("message").textContent = "🎉 Senha correta!";
+            } else {
+                attempts--;
+                document.getElementById("attempts").textContent = `Tentativas restantes: ${attempts}`;
+                if (attempts === 0) {
+                    document.getElementById("lockSection").classList.add("hidden");
+                    document.getElementById("unlockSection").classList.remove("hidden");
+                }
+            }
+        }
+
+        function insertUnlockNumber(num) {
+            let input = document.getElementById("unlockPassword");
+            if (input.value.length < 6) input.value += num;
+        }
+
+        function clearUnlockNumber() {
+            let input = document.getElementById("unlockPassword");
+            input.value = input.value.slice(0, -1);
+        }
+
+        function checkUnlockPassword() {
+            let input = document.getElementById("unlockPassword").value;
+            let unlockMessage = document.getElementById("unlockMessage");
+            if (input === unlockPassword) {
+                attempts = 10;
+                document.getElementById("attempts").textContent = `Tentativas restantes: ${attempts}`;
+                document.getElementById("unlockSection").classList.add("hidden");
+                document.getElementById("lockSection").classList.remove("hidden");
+                unlockMessage.textContent = "";
+            } else {
+                unlockMessage.textContent = "❌ Senha incorreta! Tente novamente.";
+                unlockMessage.style.color = "red";
+            }
+        }
+    </script>
+</body>
+</html>
