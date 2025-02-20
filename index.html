@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadeado Imports</title>
+    <title>Código Secreto</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body {
@@ -28,19 +28,19 @@
             text-align: center;
         }
         input {
-            padding: 10px;
-            font-size: 16px;
+            padding: 8px;
+            font-size: 14px;
             margin: 10px 0;
             border: none;
             border-radius: 5px;
             text-align: center;
-            width: 70%;
+            width: 52.5%;
             display: block;
             margin: 10px auto;
         }
         button {
-            padding: 8px 16px;
-            font-size: 14px;
+            padding: 10px 25px;
+            font-size: 16px;
             background: red;
             border: none;
             color: white;
@@ -50,11 +50,6 @@
         }
         button:hover {
             background: darkred;
-        }
-        .lock {
-            font-size: 80px;
-            display: block;
-            transition: transform 0.5s ease-in-out;
         }
         .hidden { display: none; }
         .highlight {
@@ -66,6 +61,11 @@
             font-weight: bold;
             margin-top: 10px;
         }
+        .lock {
+            font-size: 100px;
+            display: block;
+            transition: transform 0.5s ease-in-out;
+        }
         .keypad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -74,7 +74,7 @@
         }
         .keypad button {
             padding: 15px;
-            font-size: 20px;
+            font-size: 17px;
             background: #333;
             border: none;
             color: white;
@@ -85,17 +85,102 @@
         .keypad button:hover {
             background: #555;
         }
+
+        /* Animação para o cadeado abrindo */
+        @keyframes unlock {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1) rotateY(180deg);
+            }
+        }
+
+        /* Animação para o campo de senha tremendo */
+        @keyframes shake {
+            0% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-10px);
+            }
+            50% {
+                transform: translateX(10px);
+            }
+            75% {
+                transform: translateX(-10px);
+            }
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        .lock.unlock {
+            animation: unlock 1s ease-in-out;
+        }
+
+        .input-error {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .error-message {
+            color: white; /* Mensagem de erro em branco */
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .congratulations {
+            font-size: 18px; /* Tamanho menor da fonte */
+            color: white;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .username {
+            color: #26e2db; /* Cor do nome do usuário */
+        }
+
+        /* Novo título */
+        #title {
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        /* Novo texto de "Quer mais tentativas?" */
+        .highlight-white {
+            color: white;
+        }
+
+        /* Ajuste na cor e tamanho da senha */
+        #password {
+            font-weight: bold;
+            color: black;
+            font-size: 21px;
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
+        <div id="title">
+            Código Secreto 6️⃣
+        </div>
+        <div id="congratulationsMessage" class="congratulations hidden">
+            Parabéns, <span id="userNameDisplay" class="username"></span>, você acertou 👏
+        </div>
         <div id="nameSection">
             <p>Digite seu nome para começar:</p>
             <input type="text" id="username" placeholder="Seu nome">
-            <button onclick="startGame()">Iniciar</button>
+            <button id="startButton">Iniciar</button>
         </div>
         <div id="lockSection" class="hidden">
-            <p id="welcomeMessage"></p>
+            <p id="message" class="message"></p>  
             <span id="lock" class="lock">🔒</span>
             <p>Digite a senha de 6 dígitos:</p>
             <input type="password" id="password" maxlength="6" readonly>
@@ -114,13 +199,13 @@
                 <button onclick="checkPassword()">✔</button>
             </div>
             <p id="attempts">Tentativas restantes: 10</p>
-            <p id="message" class="message"></p>
+            <p id="errorMessage" class="error-message hidden">Senha incorreta! Tente novamente.</p>
         </div>
         <div id="unlockSection" class="hidden">
-            <p><strong class="highlight">Quer mais tentativas?</strong></p>
-            <p>Envie <strong class="highlight">‘MAIS’</strong> no Instagram da</p>
-            <p><strong class="highlight">@imports</strong> e receba a senha de desbloqueio!</p>
-            <input type="password" id="unlockPassword" maxlength="6" readonly>
+            <p><strong class="highlight-white">Quer mais tentativas?</strong></p>
+            <p>Envie a palavra <strong class="highlight">‘MAIS’</strong> no Instagram</p>
+            <p><strong class="highlight"> @imports.esp </strong> e receba a senha de desbloqueio!</p>
+            <input type="password" id="unlockPassword" maxlength="6">
             <div class="keypad">
                 <button onclick="insertUnlockNumber('1')">1</button>
                 <button onclick="insertUnlockNumber('2')">2</button>
@@ -136,73 +221,102 @@
                 <button onclick="checkUnlockPassword()">✔</button>
             </div>
             <p id="unlockMessage" class="message"></p>
+            <p id="unlockErrorMessage" class="error-message hidden">Senha incorreta! Tente novamente.</p>
         </div>
     </div>
 
     <script>
         let attempts = 10;
         let username = "";
-        const correctPassword = "123456";
-        const unlockPassword = "654321";
+        let clickSound = new Audio("https://www.fesliyanstudios.com/play-mp3/387");
+        let unlockSound = new Audio("https://www.myinstants.com/media/sounds/unlock-sound.mp3");
+        let errorSound = new Audio("https://www.myinstants.com/media/sounds/error-sound.mp3"); // Som de erro
+        let lockOpenSound = new Audio("https://www.myinstants.com/media/sounds/lock-open.mp3"); // Som de cadeado abrindo
+
+        document.getElementById("startButton").addEventListener("click", startGame);
 
         function startGame() {
             username = document.getElementById("username").value.trim();
             if (!username) {
                 document.getElementById("message").textContent = "Digite seu nome!";
+                document.getElementById("username").focus();
                 return;
             }
+            document.getElementById("userNameDisplay").textContent = username; // Exibe o nome no parabéns
             document.getElementById("nameSection").classList.add("hidden");
             document.getElementById("lockSection").classList.remove("hidden");
-            document.getElementById("welcomeMessage").textContent = `Bem-vindo, ${username}!`;
+            document.getElementById("message").innerHTML = `Bem-vindo, <span class="highlight">${username}</span>!`;
+            document.getElementById("attempts").textContent = `Tentativas restantes: ${attempts}`;
+            document.getElementById("errorMessage").classList.add("hidden"); // Esconde mensagem de erro ao começar
+            document.getElementById("title").classList.add("hidden"); // Esconde o título após "Iniciar"
         }
 
         function insertNumber(num) {
             let input = document.getElementById("password");
-            if (input.value.length < 6) input.value += num;
+            if (input.value.length < 6) {
+                input.value += num;
+                input.focus();
+            }
+            clickSound.currentTime = 0;
+            clickSound.play();
+        }
+
+        function insertUnlockNumber(num) {
+            let input = document.getElementById("unlockPassword");
+            if (input.value.length < 6) {
+                input.value += num;
+                input.focus();
+            }
+            clickSound.currentTime = 0;
+            clickSound.play();
         }
 
         function clearNumber() {
-            let input = document.getElementById("password");
-            input.value = input.value.slice(0, -1);
+            document.getElementById("password").value = "";
+        }
+
+        function clearUnlockNumber() {
+            document.getElementById("unlockPassword").value = "";
         }
 
         function checkPassword() {
             let input = document.getElementById("password").value;
-            if (input === correctPassword) {
+            if (input === "123456") {
                 document.getElementById("lock").textContent = "🔓";
-                document.getElementById("message").textContent = "🎉 Senha correta!";
+                document.getElementById("lock").classList.add("unlock"); // Animação de cadeado abrindo
+                lockOpenSound.play(); // Som de cadeado abrindo
+                document.getElementById("congratulationsMessage").classList.remove("hidden"); // Mensagem de parabéns
+                document.getElementById("message").classList.add("hidden"); // Esconde mensagem de boas-vindas
+                document.getElementById("password").type = "text"; // Torna a senha visível
             } else {
                 attempts--;
                 document.getElementById("attempts").textContent = `Tentativas restantes: ${attempts}`;
-                if (attempts === 0) {
+                clearNumber();
+                document.getElementById("password").classList.add("input-error"); // Adiciona animação de tremor
+                errorSound.play(); // Toca o som de erro
+                document.getElementById("errorMessage").classList.remove("hidden"); // Exibe mensagem de erro
+                setTimeout(() => {
+                    document.getElementById("password").classList.remove("input-error");
+                }, 500);
+
+                if (attempts <= 0) {
                     document.getElementById("lockSection").classList.add("hidden");
                     document.getElementById("unlockSection").classList.remove("hidden");
                 }
             }
         }
 
-        function insertUnlockNumber(num) {
-            let input = document.getElementById("unlockPassword");
-            if (input.value.length < 6) input.value += num;
-        }
-
-        function clearUnlockNumber() {
-            let input = document.getElementById("unlockPassword");
-            input.value = input.value.slice(0, -1);
-        }
-
         function checkUnlockPassword() {
             let input = document.getElementById("unlockPassword").value;
-            let unlockMessage = document.getElementById("unlockMessage");
-            if (input === unlockPassword) {
-                attempts = 10;
+            if (input === "654321") {
+                attempts = 99;
                 document.getElementById("attempts").textContent = `Tentativas restantes: ${attempts}`;
                 document.getElementById("unlockSection").classList.add("hidden");
                 document.getElementById("lockSection").classList.remove("hidden");
-                unlockMessage.textContent = "";
+                document.getElementById("errorMessage").classList.add("hidden"); // Esconde erro no teclado de desbloqueio
+                document.getElementById("unlockErrorMessage").classList.add("hidden"); // Esconde erro no segundo teclado
             } else {
-                unlockMessage.textContent = "❌ Senha incorreta! Tente novamente.";
-                unlockMessage.style.color = "red";
+                document.getElementById("unlockErrorMessage").classList.remove("hidden"); // Exibe erro no teclado de desbloqueio
             }
         }
     </script>
