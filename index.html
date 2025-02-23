@@ -214,6 +214,25 @@
         let errorSound = new Audio("https://www.myinstants.com/media/sounds/error-sound.mp3"); // Som de erro
         let lockOpenSound = new Audio("https://www.myinstants.com/media/sounds/lock-open.mp3"); // Som de cadeado abrindo
 
+        // Recuperar dados salvos do localStorage ao carregar a página
+        window.onload = function() {
+            let savedUsername = localStorage.getItem("username");
+            let savedAttempts = localStorage.getItem("attempts");
+
+            if (savedUsername) {
+                username = savedUsername;
+                document.getElementById("userNameDisplay").textContent = username;
+                document.getElementById("nameSection").classList.add("hidden");
+                document.getElementById("lockSection").classList.remove("hidden");
+                document.getElementById("message").innerHTML = `Bem-vindo, <span class="highlight">${username}</span>!`;
+            }
+
+            if (savedAttempts) {
+                attempts = parseInt(savedAttempts);
+                document.getElementById("attempts").textContent = `Tentativas restantes: ${attempts}`;
+            }
+        };
+
         document.getElementById("startButton").addEventListener("click", startGame);
 
         function startGame() {
@@ -230,6 +249,10 @@
             document.getElementById("attempts").textContent = `Tentativas restantes: ${attempts}`;
             document.getElementById("errorMessage").classList.add("hidden"); // Esconde mensagem de erro ao começar
             document.getElementById("title").classList.add("hidden"); // Esconde o título após "Iniciar"
+
+            // Salvar nome e tentativas no localStorage
+            localStorage.setItem("username", username);
+            localStorage.setItem("attempts", attempts);
         }
 
         function insertNumber(num) {
@@ -262,7 +285,7 @@
 
         function checkPassword() {
             let input = document.getElementById("password").value;
-            if (input === "123456") {
+            if (input === "483920") {
                 document.getElementById("lock").textContent = "🔓";
                 document.getElementById("lock").classList.add("unlock"); // Animação de cadeado abrindo
                 lockOpenSound.play(); // Som de cadeado abrindo
@@ -284,6 +307,9 @@
                     document.getElementById("password").classList.remove("input-error");
                 }, 500);
 
+                // Atualizar tentativas no localStorage
+                localStorage.setItem("attempts", attempts);
+
                 if (attempts <= 0) {
                     document.getElementById("lockSection").classList.add("hidden");
                     document.getElementById("unlockSection").classList.remove("hidden");
@@ -293,13 +319,17 @@
 
         function checkUnlockPassword() {
             let input = document.getElementById("unlockPassword").value;
-            if (input === "654321") {
-                attempts = 999; // Alterado para 999 ao invés de 99
+            if (input === "201024") {
+                attempts = 999;  // Alterado para 999 ao invés de 99
                 document.getElementById("attempts").textContent = `Tentativas restantes: ${attempts}`;
                 document.getElementById("unlockSection").classList.add("hidden");
                 document.getElementById("lockSection").classList.remove("hidden");
                 document.getElementById("errorMessage").classList.add("hidden"); // Esconde erro no teclado de desbloqueio
                 document.getElementById("unlockErrorMessage").classList.add("hidden"); // Esconde erro no segundo teclado
+
+                // Resetar dados do localStorage após desbloqueio
+                localStorage.removeItem("username");
+                localStorage.removeItem("attempts");
             } else {
                 document.getElementById("unlockErrorMessage").classList.remove("hidden"); // Exibe erro no teclado de desbloqueio
             }
