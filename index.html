@@ -99,25 +99,6 @@
             }
         }
 
-        /* Animação para o campo de senha tremendo */
-        @keyframes shake {
-            0% {
-                transform: translateX(0);
-            }
-            25% {
-                transform: translateX(-10px);
-            }
-            50% {
-                transform: translateX(10px);
-            }
-            75% {
-                transform: translateX(-10px);
-            }
-            100% {
-                transform: translateX(0);
-            }
-        }
-
         .lock.unlock {
             animation: unlock 1s ease-in-out;
         }
@@ -184,7 +165,7 @@
             <span id="lock" class="lock">🔒</span>
             <p>Digite a senha de 6 dígitos:</p>
             <input type="password" id="password" maxlength="6" readonly>
-            <div class="keypad">
+            <div class="keypad" id="keypad">
                 <button onclick="insertNumber('1')">1</button>
                 <button onclick="insertNumber('2')">2</button>
                 <button onclick="insertNumber('3')">3</button>
@@ -288,6 +269,10 @@
                 document.getElementById("congratulationsMessage").classList.remove("hidden"); // Mensagem de parabéns
                 document.getElementById("message").classList.add("hidden"); // Esconde mensagem de boas-vindas
                 document.getElementById("password").type = "text"; // Torna a senha visível
+                
+                // Esconde o teclado
+                document.getElementById("keypad").classList.add("hidden");
+
             } else {
                 attempts--;
                 document.getElementById("attempts").textContent = `Tentativas restantes: ${attempts}`;
@@ -309,7 +294,7 @@
         function checkUnlockPassword() {
             let input = document.getElementById("unlockPassword").value;
             if (input === "654321") {
-                attempts = 99;
+                attempts = 999; // Alterado para 999 ao invés de 99
                 document.getElementById("attempts").textContent = `Tentativas restantes: ${attempts}`;
                 document.getElementById("unlockSection").classList.add("hidden");
                 document.getElementById("lockSection").classList.remove("hidden");
