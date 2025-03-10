@@ -193,29 +193,11 @@
       return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
-    const ENCRYPTED_MAIN_PASSWORD = process.env.ENCRYPTED_MAIN_PASSWORD;
-    const ENCRYPTED_UNLOCK_PASSWORD = process.env.ENCRYPTED_UNLOCK_PASSWORD;
+    const ENCRYPTED_MAIN_PASSWORD = '66d1ef11d2509b176ce9698ee299ab035c1a65f27493811758cddca79f247af4'; // 211014
+    const ENCRYPTED_UNLOCK_PASSWORD = 'beb17c2d328878e6383218244cf9b3bd4416d577e0008f6804b6252ce5cc9a57'; // 100325
 
     let attempts = 10;
     let username = "";
-
-    window.onload = function() {
-      let savedUsername = localStorage.getItem("username");
-      let savedAttempts = localStorage.getItem("attempts");
-
-      if (savedUsername) {
-        username = savedUsername;
-        document.getElementById("userNameDisplay").textContent = username;
-        document.getElementById("nameSection").classList.add("hidden");
-        document.getElementById("lockSection").classList.remove("hidden");
-        document.getElementById("message").innerHTML = `Bem-vindo, <span class="highlight">${username}</span>!`;
-      }
-
-      if (savedAttempts) {
-        attempts = parseInt(savedAttempts);
-        document.getElementById("attempts").textContent = `Tentativas restantes: ${attempts}`;
-      }
-    };
 
     document.getElementById("startButton").addEventListener("click", startGame);
 
