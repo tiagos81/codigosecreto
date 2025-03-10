@@ -185,17 +185,6 @@
   </div>
 
   <script>
-    /*
-      Apenas os hashes SHA‑256 das senhas são armazenados no código,
-      sem que os valores em texto simples fiquem expostos.
-      
-      MAIN_PASSWORD  → 66d1ef11d2509b176ce9698ee299ab035c1a65f27493811758cddca79f247af4
-      UNLOCK_PASSWORD  → beb17c2d328878e6383218244cf9b3bd4416d577e0008f6804b6252ce5cc9a57
-    */
-    const ENCRYPTED_MAIN_PASSWORD = "66d1ef11d2509b176ce9698ee299ab035c1a65f27493811758cddca79f247af4";
-    const ENCRYPTED_UNLOCK_PASSWORD = "beb17c2d328878e6383218244cf9b3bd4416d577e0008f6804b6252ce5cc9a57";
-
-    // Função para calcular o hash SHA‑256 e retornar uma string hexadecimal
     async function getHash(str) {
       const encoder = new TextEncoder();
       const data = encoder.encode(str);
@@ -204,12 +193,11 @@
       return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
+    const ENCRYPTED_MAIN_PASSWORD = process.env.ENCRYPTED_MAIN_PASSWORD;
+    const ENCRYPTED_UNLOCK_PASSWORD = process.env.ENCRYPTED_UNLOCK_PASSWORD;
+
     let attempts = 10;
     let username = "";
-    let clickSound = new Audio("https://www.fesliyanstudios.com/play-mp3/387");
-    let unlockSound = new Audio("https://www.myinstants.com/media/sounds/unlock-sound.mp3");
-    let errorSound = new Audio("https://www.myinstants.com/media/sounds/error-sound.mp3");
-    let lockOpenSound = new Audio("https://www.myinstants.com/media/sounds/lock-open.mp3");
 
     window.onload = function() {
       let savedUsername = localStorage.getItem("username");
@@ -256,74 +244,34 @@
         input.value += num;
         input.focus();
       }
-      clickSound.currentTime = 0;
-      clickSound.play();
-    }
-
-    function insertUnlockNumber(num) {
-      let input = document.getElementById("unlockPassword");
-      if (input.value.length < 6) {
-        input.value += num;
-        input.focus();
-      }
-      clickSound.currentTime = 0;
-      clickSound.play();
     }
 
     function clearNumber() {
       document.getElementById("password").value = "";
     }
 
-    function clearUnlockNumber() {
-      document.getElementById("unlockPassword").value = "";
-    }
-
-    // Verificação da senha principal usando hash SHA‑256
     async function checkPassword() {
       let input = document.getElementById("password").value;
       let hashedInput = await getHash(input);
       if (hashedInput === ENCRYPTED_MAIN_PASSWORD) {
         document.getElementById("lock").textContent = "🔓";
         document.getElementById("lock").classList.add("unlock");
-        lockOpenSound.play();
-        document.getElementById("congratulationsMessage").classList.remove("hidden");
-        document.getElementById("message").classList.add("hidden");
-        document.getElementById("password").type = "text";
-        document.getElementById("keypad").classList.add("hidden");
       } else {
         attempts--;
         document.getElementById("attempts").textContent = `Tentativas restantes: ${attempts}`;
         clearNumber();
-        document.getElementById("password").classList.add("input-error");
-        errorSound.play();
-        document.getElementById("errorMessage").classList.remove("hidden");
-        setTimeout(() => {
-          document.getElementById("password").classList.remove("input-error");
-        }, 500);
-        localStorage.setItem("attempts", attempts);
         if (attempts <= 0) {
           document.getElementById("lockSection").classList.add("hidden");
-          document.getElementById("unlockSection").classList.remove("hidden");
         }
       }
     }
 
-    // Verificação da senha de desbloqueio usando hash SHA‑256
     async function checkUnlockPassword() {
       let input = document.getElementById("unlockPassword").value;
       let hashedInput = await getHash(input);
       if (hashedInput === ENCRYPTED_UNLOCK_PASSWORD) {
         attempts = 999;
         document.getElementById("attempts").textContent = `Tentativas restantes: ${attempts}`;
-        document.getElementById("unlockSection").classList.add("hidden");
-        document.getElementById("lockSection").classList.remove("hidden");
-        document.getElementById("errorMessage").classList.add("hidden");
-        document.getElementById("unlockErrorMessage").classList.add("hidden");
-
-        localStorage.removeItem("username");
-        localStorage.removeItem("attempts");
-      } else {
-        document.getElementById("unlockErrorMessage").classList.remove("hidden");
       }
     }
   </script>
