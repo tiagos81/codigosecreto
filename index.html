@@ -157,30 +157,7 @@
         <button onclick="insertNumber('0')">0</button>
         <button onclick="checkPassword()">✔</button>
       </div>
-      <p id="attempts">Tentativas restantes: 10</p>
       <p id="errorMessage" class="error-message hidden">Senha incorreta! Tente novamente.</p>
-    </div>
-    <div id="unlockSection" class="hidden">
-      <p><strong class="highlight-white">Quer mais tentativas?</strong></p>
-      <p>Envie a palavra <strong class="highlight">‘MAIS’</strong> no Instagram</p>
-      <p><strong class="highlight"> @imports.esp </strong> e receba a senha de desbloqueio!</p>
-      <input type="password" id="unlockPassword" maxlength="6">
-      <div class="keypad">
-        <button onclick="insertUnlockNumber('1')">1</button>
-        <button onclick="insertUnlockNumber('2')">2</button>
-        <button onclick="insertUnlockNumber('3')">3</button>
-        <button onclick="insertUnlockNumber('4')">4</button>
-        <button onclick="insertUnlockNumber('5')">5</button>
-        <button onclick="insertUnlockNumber('6')">6</button>
-        <button onclick="insertUnlockNumber('7')">7</button>
-        <button onclick="insertUnlockNumber('8')">8</button>
-        <button onclick="insertUnlockNumber('9')">9</button>
-        <button onclick="clearUnlockNumber()">⌫</button>
-        <button onclick="insertUnlockNumber('0')">0</button>
-        <button onclick="checkUnlockPassword()">✔</button>
-      </div>
-      <p id="unlockMessage" class="message"></p>
-      <p id="unlockErrorMessage" class="error-message hidden">Senha incorreta! Tente novamente.</p>
     </div>
   </div>
 
@@ -193,10 +170,18 @@
       return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
-    const ENCRYPTED_MAIN_PASSWORD = '66d1ef11d2509b176ce9698ee299ab035c1a65f27493811758cddca79f247af4'; // 211014
-    const ENCRYPTED_UNLOCK_PASSWORD = 'beb17c2d328878e6383218244cf9b3bd4416d577e0008f6804b6252ce5cc9a57'; // 100325
+    let ENCRYPTED_MAIN_PASSWORD = '';
 
-    let attempts = 10;
+    // Função para buscar a senha no servidor
+    async function fetchConfig() {
+      const response = await fetch('/config');
+      const config = await response.json();
+      ENCRYPTED_MAIN_PASSWORD = config.mainPassword;
+    }
+
+    // Chamando a função para carregar as variáveis de ambiente
+    window.onload = fetchConfig;
+
     let username = "";
 
     document.getElementById("startButton").addEventListener("click", startGame);
@@ -212,12 +197,9 @@
       document.getElementById("nameSection").classList.add("hidden");
       document.getElementById("lockSection").classList.remove("hidden");
       document.getElementById("message").innerHTML = `Bem-vindo, <span class="highlight">${username}</span>!`;
-      document.getElementById("attempts").textContent = `Tentativas restantes: ${attempts}`;
       document.getElementById("errorMessage").classList.add("hidden");
-      document.getElementById("title").classList.add("hidden");
 
       localStorage.setItem("username", username);
-      localStorage.setItem("attempts", attempts);
     }
 
     function insertNumber(num) {
@@ -238,22 +220,13 @@
       if (hashedInput === ENCRYPTED_MAIN_PASSWORD) {
         document.getElementById("lock").textContent = "🔓";
         document.getElementById("lock").classList.add("unlock");
+        document.getElementById("congratulationsMessage").classList.remove("hidden");
+        document.getElementById("message").classList.add("hidden");
+        document.getElementById("password").type = "text";
+        document.getElementById("keypad").classList.add("hidden");
       } else {
-        attempts--;
-        document.getElementById("attempts").textContent = `Tentativas restantes: ${attempts}`;
         clearNumber();
-        if (attempts <= 0) {
-          document.getElementById("lockSection").classList.add("hidden");
-        }
-      }
-    }
-
-    async function checkUnlockPassword() {
-      let input = document.getElementById("unlockPassword").value;
-      let hashedInput = await getHash(input);
-      if (hashedInput === ENCRYPTED_UNLOCK_PASSWORD) {
-        attempts = 999;
-        document.getElementById("attempts").textContent = `Tentativas restantes: ${attempts}`;
+        document.getElementById("errorMessage").classList.remove("hidden");
       }
     }
   </script>
